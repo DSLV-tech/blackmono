@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- SEO & Open Graph -->
+    <meta name="description" content="BLACKMONO — Un archivio editoriale sui meccanismi della mente umana. Insight su cognizione, estetica e sopravvivenza mentale.">
+    <meta property="og:title" content="BLACKMONO | Il Nesso del Logos">
+    <meta property="og:description" content="Meccanismi della mente. Leve per la giornata.">
+    <meta property="og:type" content="website">
+    <meta name="theme-color" content="#050505">
+
+    <!-- Font: preconnect + stylesheet nel <head> è più veloce di @import in CSS -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400&family=Playfair+Display:ital,wght@0,700;1,400&display=swap">
+
+    <link rel="stylesheet" href="style.css">
+    <title>BLACKMONO | Il Nesso del Logos</title>
+</head>
+<body>
+
+    <!-- OVERLAY EFFETTI FISSI -->
+    <div id="cave-mask"></div>
+    <div id="lever-line"></div>
+    <div class="lever-info">
+        <span id="gravity-status">GRAVITY: 9.81 M/S²</span><br>
+        <span id="lever-status">LEVER: STATIC</span>
+    </div>
+
+    <!-- HEADER -->
+    <header id="site-header">
+        <div class="logo-mark">
+            <a href="index.html"><span class="logo-black">BLACK</span><span class="logo-mono">MONO</span></a>
+        </div>
+        <nav>
+            <ul class="site-nav">
+                <li><a href="#frequenze">FREQUENZE</a></li>
+                <li><a href="#nexus">ARCHIVIO</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <!-- ── HERO ──────────────────────────────────────────── -->
+    <section id="hero">
+        <div class="hero-content">
+
+            <!-- Sigillo "Lever Mind":
+                 cerchio = la mente / sfera della coscienza
+                 leva    = passa esattamente per il centro (x=100, y=90)
+                 fulcro  = triangolo sotto la leva
+                 nodo ●  = in alto a destra  → la mente sollevata
+                 nodo ○  = in basso a sinistra → il peso / la gravità -->
+            <svg class="logo-sigil reveal-text" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <!-- Cerchio della mente -->
+                <circle cx="100" cy="90" r="58" stroke="#ffd900" stroke-width="1.5" opacity="0.85"/>
+
+                <!-- Leva inclinata: da (30,111) a (170,69), passa per (100,90) -->
+                <line x1="30" y1="111" x2="170" y2="69" stroke="#ffd900" stroke-width="2.5" stroke-linecap="round"/>
+
+                <!-- Fulcro: triangolo con punta sul centro della leva -->
+                <path d="M100 90 L91 112 L109 112" stroke="#ffd900" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"/>
+
+                <!-- Base del fulcro -->
+                <line x1="83" y1="115" x2="117" y2="115" stroke="#ffd900" stroke-width="1.5" stroke-linecap="round"/>
+
+                <!-- Nodo sollevato: estremo alto-destra -->
+                <circle cx="164" cy="71" r="4" fill="#ffd900"/>
+
+                <!-- Nodo peso: estremo basso-sinistra -->
+                <circle cx="36" cy="109" r="5.5" stroke="#ffd900" stroke-width="1.5"/>
+            </svg>
+
+            <h1 class="site-title reveal-text">BLACK<span class="title-mono">MONO</span></h1>
+
+            <p class="hero-tagline reveal-delayed">
+                "Meccanismi della mente. Leve per la giornata."
+            </p>
+
+            <p class="hero-sub reveal-slow">
+                Un archivio editoriale sulla cognizione umana, l'estetica e la sopravvivenza mentale.
+                Ogni articolo è una leva: piccola da leggere, potente da usare.
+            </p>
+
+            <div class="cta-group reveal-slow">
+                <a href="#nexus" class="btn-primary">ENTRA NEL NEXUS</a>
+                <a href="#frequenze" class="btn-ghost">Scopri le 5 Frequenze →</a>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- ── LE 5 FREQUENZE ────────────────────────────────── -->
+    <section id="frequenze" class="section">
+        <div class="section-label">// FREQUENZE_DEL_SEGNALE</div>
+        <h2 class="section-title">Cinque modi di capire la mente</h2>
+        <p class="section-sub">
+            Ogni contenuto risuona su una frequenza. Ogni frequenza è un modo di vedere — e di agire sul mondo.
+        </p>
+
+        <div class="freq-grid">
+
+            <div class="freq-card" data-freq="picaresca" style="--freq-color: var(--freq-picaresca);">
+                <span class="freq-dot"></span>
+                <div class="freq-name">Picaresca</div>
+                <p class="freq-desc">Sopravvivenza cognitiva. Come la mente ragiona sotto pressione, trova scorciatoie e legge le crepe del sistema.</p>
+            </div>
+
+            <div class="freq-card" data-freq="corale" style="--freq-color: var(--freq-corale);">
+                <span class="freq-dot"></span>
+                <div class="freq-name">Corale</div>
+                <p class="freq-desc">La mente collettiva. Come i gruppi pensano, decidono e si difendono insieme — dalla tribù ai social network.</p>
+            </div>
+
+            <div class="freq-card" data-freq="logos" style="--freq-color: var(--freq-logos);">
+                <span class="freq-dot"></span>
+                <div class="freq-name">Logos</div>
+                <p class="freq-desc">Pensiero razionale e modelli mentali. La matematica come linguaggio, la logica come atto di liberazione.</p>
+            </div>
+
+            <div class="freq-card" data-freq="eterea" style="--freq-color: var(--freq-eterea);">
+                <span class="freq-dot"></span>
+                <div class="freq-name">Eterea</div>
+                <p class="freq-desc">Estetica e stati di flusso. Come la bellezza agisce sul cervello e perché il design cambia il modo di pensare.</p>
+            </div>
+
+            <div class="freq-card" data-freq="entropia" style="--freq-color: var(--freq-entropia);">
+                <span class="freq-dot"></span>
+                <div class="freq-name">Entropia</div>
+                <p class="freq-desc">Il futuro della cognizione. Intelligenza artificiale, complessità e il destino della mente nell'era dell'informazione.</p>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- ── ARCHIVIO SINAPTICO ─────────────────────────────── -->
+    <section id="nexus" class="section">
+        <div class="section-label">// ARCHIVIO_SINAPTICO</div>
+        <h2 class="section-title">Articoli</h2>
+        <p class="section-sub">
+            Ogni testo analizza un personaggio storico, un meccanismo cognitivo o una tecnica mentale. Una leva da usare subito.
+        </p>
+
+        <div class="article-grid">
+
+            <a href="articoli/reader.html?a=mente-picaresca.md" class="article-card" style="--freq-color: var(--freq-picaresca);">
+                <span class="freq-tag">PICARESCA</span>
+                <div class="card-meta">6 MIN DI LETTURA</div>
+                <h3 class="article-title">La Mente Picaresca: come il cervello impara a trovare le uscite</h3>
+                <p class="article-excerpt">Le euristiche non sono difetti cognitivi — sono il motore evolutivo della sopravvivenza. Kahneman, Lazarillo e il metodo del feedback loop rapido.</p>
+                <span class="article-link">LEGGI L'ANALISI →</span>
+            </a>
+
+            <a href="articoli/reader.html?a=malba-tahan.md" class="article-card" style="--freq-color: var(--freq-logos);">
+                <span class="freq-tag">LOGOS</span>
+                <div class="card-meta">3 MIN DI LETTURA</div>
+                <h3 class="article-title">Beremiz Samir: La Geometria della Giustizia</h3>
+                <p class="article-excerpt">Il calcolo non serve a misurare la materia, ma a ristabilire l'armonia tra gli uomini. Malba Tahan e il potere dei modelli matematici applicati alla vita reale.</p>
+                <span class="article-link">LEGGI L'ANALISI →</span>
+            </a>
+
+            <a href="articoli/reader.html?a=pilota-01.md" class="article-card" style="--freq-color: var(--freq-picaresca);">
+                <span class="freq-tag">PICARESCA · CORALE · ENTROPIA</span>
+                <div class="card-meta">3 MIN DI LETTURA</div>
+                <h3 class="article-title">Da Lazarillo ad Asimov: La Leva dell'Essere</h3>
+                <p class="article-excerpt">Come la mente evolve dalla sopravvivenza istintiva alla visione cosmica. Un viaggio attraverso quattro archetipi cognitivi che definiscono ogni essere umano.</p>
+                <span class="article-link">LEGGI L'ANALISI →</span>
+            </a>
+
+            <a href="articoli/reader.html?a=pilota-02.md" class="article-card" style="--freq-color: var(--freq-logos);">
+                <span class="freq-tag">LOGOS</span>
+                <div class="card-meta">3 MIN DI LETTURA</div>
+                <h3 class="article-title">La Matematica del Logos: Rompere le Catene del Calcolo</h3>
+                <p class="article-excerpt">La matematica vedica non è magia: è tecnica. Come liberarsi dal peso del calcolo convenzionale e allenare una mente più rapida e più libera.</p>
+                <span class="article-link">LEGGI L'ANALISI →</span>
+            </a>
+
+        </div>
+    </section>
+
+    <!-- ── VOLTA DELL'ENTROPIA ────────────────────────────── -->
+    <section id="entropy-vault">
+        <div id="entropy-field" class="entropy-bg"></div>
+        <div class="nexus-focus">
+            <h2 class="vault-title">ORDINARE IL VUOTO</h2>
+            <p class="vault-sub">// L'entropia non è il nemico — è il materiale grezzo.</p>
+        </div>
+    </section>
+
+    <!-- ── FOOTER ─────────────────────────────────────────── -->
+    <footer class="site-footer">
+        <div class="footer-inner">
+            <div class="logo-mark">
+                <span class="logo-black">BLACK</span><span class="logo-mono">MONO</span>
+            </div>
+            <p class="footer-copy">
+                Un archivio editoriale sui meccanismi della mente umana. &mdash;
+                <a href="https://dslv.tech" target="_blank" rel="noopener">DSLV.tech</a>
+            </p>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>

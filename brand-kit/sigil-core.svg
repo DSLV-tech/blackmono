@@ -1,0 +1,36 @@
+<svg viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!--
+    BLACKMONO — Sigillo "Lever Mind" v2
+    ─────────────────────────────────────
+    Cerchio  = la mente / sfera della coscienza
+    Leva     = attraversa il centro esatto (100, 90)
+    Fulcro   = punto di trasformazione della conoscenza in azione
+    Nodo ●   = mente sollevata / conoscenza acquisita
+    Nodo ○   = peso / gravità / problema da superare
+    ─────────────────────────────────────
+    Palette: #ffd900 su #050505
+  -->
+
+  <!-- Cerchio della mente -->
+  <circle cx="100" cy="90" r="58"
+          stroke="#ffd900" stroke-width="1.5" opacity="0.85"/>
+
+  <!-- Leva: da (30,111) a (170,69), centro geometrico = (100,90) -->
+  <line x1="30" y1="111" x2="170" y2="69"
+        stroke="#ffd900" stroke-width="2.5" stroke-linecap="round"/>
+
+  <!-- Fulcro: triangolo con punta sul centro della leva -->
+  <path d="M100 90 L91 112 L109 112"
+        stroke="#ffd900" stroke-width="1.5"
+        stroke-linejoin="round" stroke-linecap="round"/>
+
+  <!-- Base del fulcro -->
+  <line x1="83" y1="115" x2="117" y2="115"
+        stroke="#ffd900" stroke-width="1.5" stroke-linecap="round"/>
+
+  <!-- Nodo sollevato: estremo alto-destra -->
+  <circle cx="164" cy="71" r="4" fill="#ffd900"/>
+
+  <!-- Nodo peso: estremo basso-sinistra -->
+  <circle cx="36" cy="109" r="5.5" stroke="#ffd900" stroke-width="1.5"/>
+</svg>

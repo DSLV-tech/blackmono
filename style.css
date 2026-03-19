@@ -1,0 +1,526 @@
+/* ============================================================
+   BLACKMONO — Brand Identity v2
+   Missione: meccanismi della mente, leve per la giornata.
+   ============================================================ */
+
+/* Font caricati via <link> nell'HTML — qui solo i fallback */
+
+/* ── TOKEN DI BRAND ──────────────────────────────────────── */
+:root {
+    /* Palette core */
+    --bg:           #050505;
+    --surface:      #0d0d0d;
+    --surface-2:    #111111;
+    --border:       rgba(255, 255, 255, 0.06);
+    --text:         #e0e0e0;
+    --text-muted:   rgba(224, 224, 224, 0.45);
+    --gold:         #ffd900;
+
+    /* 5 Frequenze */
+    --freq-picaresca: #c9a96e;
+    --freq-corale:    #4fa8d5;
+    --freq-logos:     #5fd4b3;
+    --freq-eterea:    #b794f4;
+    --freq-entropia:  #f87171;
+
+    /* Tipografia */
+    --font-mono:   'JetBrains Mono', monospace;
+    --font-serif:  'Playfair Display', serif;
+
+    /* Spaziatura */
+    --pad-x: clamp(1.5rem, 5vw, 6rem);
+    --pad-y: clamp(4rem, 10vh, 7rem);
+}
+
+/* ── RESET & BASE ────────────────────────────────────────── */
+*, *::before, *::after {
+    margin: 0; padding: 0;
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font-mono);
+    overflow-x: hidden;
+    line-height: 1.6;
+}
+
+a { color: inherit; text-decoration: none; }
+img, svg { display: block; }
+
+/* ── OVERLAY FISSI ───────────────────────────────────────── */
+
+/* Maschera "torcia" — segue il cursore */
+#cave-mask {
+    position: fixed; top: 0; left: 0;
+    width: 100vw; height: 100vh;
+    z-index: 100; pointer-events: none;
+    mix-blend-mode: multiply;
+    background: radial-gradient(
+        circle at var(--mouse-x, 50%) var(--mouse-y, 50%),
+        transparent 90px,
+        rgba(0, 0, 0, 0.92) 300px
+    );
+}
+
+/* Linea leva — scorre con lo scroll */
+#lever-line {
+    position: fixed;
+    height: 1px; width: 100vw;
+    background: var(--gold);
+    top: 50%; left: 0;
+    z-index: 15;
+    box-shadow: 0 0 10px var(--gold);
+    pointer-events: none;
+    transition: top 0.08s ease-out, background-color 0.3s ease;
+    opacity: 0.6;
+}
+
+/* HUD telemetria */
+.lever-info {
+    position: fixed;
+    bottom: 1.5rem; right: 1.5rem;
+    font-size: 0.55rem;
+    letter-spacing: 0.2rem;
+    color: var(--gold);
+    z-index: 101;
+    opacity: 0.7;
+    line-height: 1.9;
+}
+
+/* ── HEADER ──────────────────────────────────────────────── */
+
+#site-header {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 50;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.25rem var(--pad-x);
+    border-bottom: 1px solid transparent;
+    transition: border-color 0.3s, background 0.3s, backdrop-filter 0.3s;
+}
+
+#site-header.scrolled {
+    background: rgba(5, 5, 5, 0.88);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    border-color: var(--border);
+}
+
+/* Logo: split visivo tra "BLACK" (serif) e "MONO" (mono) */
+.logo-mark {
+    font-size: 1rem;
+    line-height: 1;
+}
+
+.logo-mark a { color: inherit; text-decoration: none; }
+
+.logo-black {
+    font-family: var(--font-serif);
+    font-weight: 700;
+    color: #fff;
+    letter-spacing: 0.02em;
+}
+
+.logo-mono {
+    font-family: var(--font-mono);
+    font-weight: 300;
+    color: var(--gold);
+    letter-spacing: 0.25em;
+}
+
+.site-nav {
+    display: flex;
+    gap: 2.5rem;
+    list-style: none;
+}
+
+.site-nav a {
+    font-size: 0.58rem;
+    letter-spacing: 0.2rem;
+    color: var(--text-muted);
+    transition: color 0.2s;
+}
+
+.site-nav a:hover { color: var(--gold); }
+
+/* ── HERO ────────────────────────────────────────────────── */
+
+#hero {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    padding: var(--pad-y) var(--pad-x);
+    padding-top: calc(var(--pad-y) + 4rem);
+    position: relative;
+}
+
+.hero-content {
+    position: relative;
+    z-index: 2;
+    max-width: 720px;
+}
+
+.logo-sigil {
+    width: clamp(48px, 7vw, 80px);
+    margin-bottom: 2.5rem;
+}
+
+h1.site-title {
+    font-family: var(--font-serif);
+    font-size: clamp(3.5rem, 10vw, 9rem);
+    color: var(--gold);
+    line-height: 0.95;
+    margin-bottom: 2rem;
+    letter-spacing: -0.02em;
+}
+
+/* Split tipografico nel titolo hero */
+.title-mono {
+    font-family: var(--font-mono);
+    font-weight: 300;
+    color: rgba(255, 255, 255, 0.55);
+    font-size: 0.78em;
+    letter-spacing: 0.04em;
+}
+
+.hero-tagline {
+    font-family: var(--font-serif);
+    font-style: italic;
+    font-size: clamp(1rem, 2vw, 1.35rem);
+    color: var(--text);
+    opacity: 0.85;
+    margin-bottom: 1.25rem;
+    max-width: 560px;
+    line-height: 1.5;
+}
+
+.hero-sub {
+    font-size: 0.78rem;
+    color: var(--text-muted);
+    max-width: 460px;
+    line-height: 1.9;
+    margin-bottom: 3rem;
+}
+
+.cta-group {
+    display: flex;
+    gap: 2rem;
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+.btn-primary {
+    display: inline-block;
+    padding: 0.8rem 2.2rem;
+    background: var(--gold);
+    color: #000;
+    font-family: var(--font-mono);
+    font-size: 0.6rem;
+    letter-spacing: 0.25rem;
+    transition: opacity 0.2s;
+}
+
+.btn-primary:hover { opacity: 0.8; }
+
+.btn-ghost {
+    font-size: 0.6rem;
+    letter-spacing: 0.2rem;
+    color: var(--text-muted);
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 2px;
+    transition: color 0.2s, border-color 0.2s;
+}
+
+.btn-ghost:hover { color: var(--text); border-color: rgba(255,255,255,0.3); }
+
+/* ── SEZIONE GENERICA ────────────────────────────────────── */
+
+.section {
+    padding: var(--pad-y) var(--pad-x);
+    position: relative;
+    z-index: 2;
+    border-top: 1px solid var(--border);
+}
+
+.section-label {
+    font-size: 0.55rem;
+    letter-spacing: 0.35rem;
+    color: var(--gold);
+    opacity: 0.5;
+    text-transform: uppercase;
+    margin-bottom: 1.5rem;
+}
+
+.section-title {
+    font-family: var(--font-serif);
+    font-size: clamp(1.8rem, 4vw, 2.8rem);
+    color: #fff;
+    margin-bottom: 0.75rem;
+    line-height: 1.2;
+}
+
+.section-sub {
+    font-size: 0.78rem;
+    color: var(--text-muted);
+    max-width: 500px;
+    line-height: 1.9;
+    margin-bottom: 3rem;
+}
+
+/* ── LE 5 FREQUENZE ──────────────────────────────────────── */
+
+.freq-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1px;
+    background: var(--border);
+    border: 1px solid var(--border);
+}
+
+.freq-card {
+    background: var(--bg);
+    padding: 2rem 1.75rem;
+    cursor: default;
+    transition: background 0.25s;
+    position: relative;
+    overflow: hidden;
+}
+
+/* Indicatore colore laterale */
+.freq-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 3px; height: 100%;
+    background: var(--freq-color, var(--gold));
+    transform: scaleY(0);
+    transform-origin: bottom;
+    transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.freq-card:hover { background: var(--surface); }
+.freq-card:hover::before { transform: scaleY(1); }
+
+.freq-dot {
+    display: inline-block;
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    background: var(--freq-color, var(--gold));
+    margin-bottom: 1.25rem;
+}
+
+.freq-name {
+    font-family: var(--font-serif);
+    font-size: 1.2rem;
+    color: #fff;
+    margin-bottom: 0.75rem;
+}
+
+.freq-desc {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    line-height: 1.8;
+    margin-bottom: 1.25rem;
+}
+
+
+/* ── GRIGLIA ARTICOLI ────────────────────────────────────── */
+
+.article-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1px;
+    background: var(--border);
+    border: 1px solid var(--border);
+}
+
+.article-card {
+    background: var(--bg);
+    padding: 2.5rem 2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    transition: background 0.25s;
+    position: relative;
+    overflow: hidden;
+}
+
+.article-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 2px;
+    background: var(--freq-color, var(--gold));
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.article-card:hover { background: var(--surface); }
+.article-card:hover::before { transform: scaleX(1); }
+
+.freq-tag {
+    font-size: 0.52rem;
+    letter-spacing: 0.22rem;
+    color: var(--freq-color, var(--gold));
+    border: 1px solid var(--freq-color, var(--gold));
+    display: inline-block;
+    width: fit-content;
+    padding: 0.25rem 0.6rem;
+    opacity: 0.75;
+}
+
+.article-title {
+    font-family: var(--font-serif);
+    font-size: 1.35rem;
+    color: #fff;
+    line-height: 1.3;
+}
+
+.article-excerpt {
+    font-size: 0.76rem;
+    color: var(--text-muted);
+    line-height: 1.85;
+    flex: 1;
+}
+
+.article-link {
+    font-size: 0.58rem;
+    letter-spacing: 0.2rem;
+    color: var(--gold);
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: auto;
+    transition: gap 0.25s;
+}
+
+.article-card:hover .article-link { gap: 1rem; }
+
+/* Meta riga: tempo di lettura */
+.card-meta {
+    font-size: 0.52rem;
+    letter-spacing: 0.2rem;
+    color: var(--text-muted);
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.card-meta::before {
+    content: '';
+    display: inline-block;
+    width: 20px;
+    height: 1px;
+    background: var(--border);
+    vertical-align: middle;
+}
+
+/* ── VOLTA DELL'ENTROPIA ─────────────────────────────────── */
+
+#entropy-vault {
+    height: 100vh;
+    position: relative;
+    overflow: hidden;
+    background: #000;
+    border-top: 1px solid var(--border);
+}
+
+.entropy-bg {
+    position: absolute; top: 0; left: 0;
+    width: 100%; height: 100%;
+    z-index: 1; opacity: 0.15;
+    background-image: url('data:image/svg+xml;utf8,<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg"><filter id="f"><feTurbulence type="fractalNoise" baseFrequency="0.8" numOctaves="3" stitchTiles="stitch"/></filter><rect width="100%25" height="100%25" filter="url(%23f)"/></svg>');
+}
+
+.nexus-focus {
+    position: relative; z-index: 10;
+    height: 100%;
+    display: flex; flex-direction: column;
+    justify-content: center; align-items: center;
+    gap: 1.5rem;
+    pointer-events: none;
+}
+
+.vault-title {
+    font-family: var(--font-serif);
+    font-size: clamp(2rem, 5vw, 4rem);
+    color: #fff;
+    text-align: center;
+    letter-spacing: 0.5rem;
+}
+
+.vault-sub {
+    font-size: 0.65rem;
+    color: var(--text-muted);
+    letter-spacing: 0.2rem;
+    text-align: center;
+}
+
+/* ── ANIMAZIONI ENTRATA ──────────────────────────────────── */
+
+.reveal-text {
+    animation: reveal-in 1.2s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.reveal-delayed {
+    animation: reveal-in 1.2s cubic-bezier(0.16, 1, 0.3, 1) 0.2s both;
+}
+
+.reveal-slow {
+    animation: reveal-in 1.4s cubic-bezier(0.16, 1, 0.3, 1) 0.4s both;
+}
+
+@keyframes reveal-in {
+    from { opacity: 0; transform: translateY(1.5rem); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── FOOTER ──────────────────────────────────────────────── */
+
+.site-footer {
+    border-top: 1px solid var(--border);
+    padding: 3rem var(--pad-x);
+    position: relative;
+    z-index: 2;
+}
+
+.footer-inner {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+}
+
+.footer-copy {
+    font-size: 0.6rem;
+    letter-spacing: 0.1rem;
+    color: var(--text-muted);
+    line-height: 1.7;
+}
+
+.footer-copy a {
+    color: var(--gold);
+    transition: opacity 0.2s;
+}
+
+.footer-copy a:hover { opacity: 0.65; }
+
+/* ── RESPONSIVE ──────────────────────────────────────────── */
+
+@media (max-width: 768px) {
+    .site-nav              { display: none; }
+    .freq-grid             { grid-template-columns: 1fr; }
+    .article-grid          { grid-template-columns: 1fr; }
+    .vault-title           { letter-spacing: 0.15rem; }
+    #lever-line            { height: 3px; }
+    .cta-group             { flex-direction: column; align-items: flex-start; gap: 1.25rem; }
+}

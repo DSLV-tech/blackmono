@@ -1,0 +1,848 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap">
+
+    <title>BLACKMONO | Archivio Sinaptico</title>
+
+    <style>
+        /* ── TOKEN ──────────────────────────────────────── */
+        :root {
+            --bg:          #050505;
+            --surface:     #0d0d0d;
+            --border:      rgba(255, 255, 255, 0.07);
+            --text:        #d8d8d8;
+            --text-muted:  rgba(216, 216, 216, 0.4);
+            --gold:        #ffd900;
+            --font-mono:   'JetBrains Mono', monospace;
+            --font-serif:  'Playfair Display', serif;
+            --freq-color:  #ffd900;
+            --reading-width: 68ch;
+        }
+
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
+
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: var(--font-serif);
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+            /* spazio per l'audio bar in basso */
+            padding-bottom: 4rem;
+        }
+
+        a { color: var(--freq-color); text-decoration: none; }
+
+        /* ── PROGRESSO LETTURA ───────────────────────────── */
+        #reading-progress {
+            position: fixed;
+            top: 0; left: 0;
+            height: 2px; width: 0%;
+            background: var(--freq-color);
+            z-index: 300;
+            transition: width 0.08s linear;
+            box-shadow: 0 0 8px var(--freq-color);
+        }
+
+        /* ── HEADER ──────────────────────────────────────── */
+        .reader-header {
+            position: sticky;
+            top: 2px; left: 0; right: 0;
+            z-index: 200;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 2rem;
+            background: rgba(5, 5, 5, 0.93);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border-bottom: 1px solid var(--border);
+            gap: 1rem;
+        }
+
+        .back-link {
+            font-family: var(--font-mono);
+            font-size: 0.58rem;
+            letter-spacing: 0.18rem;
+            color: var(--text-muted);
+            white-space: nowrap;
+            transition: color 0.2s;
+            flex-shrink: 0;
+        }
+
+        .back-link:hover { color: var(--gold); }
+
+        .header-center {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            flex: 1;
+            justify-content: center;
+        }
+
+        /* Logo nel reader */
+        .logo-mark {
+            font-size: 0.9rem;
+            line-height: 1;
+        }
+
+        .logo-black {
+            font-family: var(--font-serif);
+            font-weight: 700;
+            color: #fff;
+        }
+
+        .logo-mono {
+            font-family: var(--font-mono);
+            font-weight: 300;
+            color: var(--gold);
+            letter-spacing: 0.22em;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 1.25rem;
+            flex-shrink: 0;
+        }
+
+        #reading-time {
+            font-family: var(--font-mono);
+            font-size: 0.52rem;
+            letter-spacing: 0.12rem;
+            color: var(--text-muted);
+        }
+
+        .freq-badge {
+            font-family: var(--font-mono);
+            font-size: 0.5rem;
+            letter-spacing: 0.2rem;
+            color: var(--freq-color);
+            border: 1px solid var(--freq-color);
+            padding: 0.2rem 0.55rem;
+            opacity: 0.8;
+        }
+
+        /* Bottone ASCOLTA nell'header */
+        #listen-btn {
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            font-family: var(--font-mono);
+            font-size: 0.55rem;
+            letter-spacing: 0.2rem;
+            color: var(--freq-color);
+            background: none;
+            border: 1px solid rgba(255, 217, 0, 0.3);
+            padding: 0.35rem 0.75rem;
+            cursor: pointer;
+            transition: border-color 0.2s, background 0.2s;
+            white-space: nowrap;
+        }
+
+        #listen-btn:hover {
+            border-color: var(--freq-color);
+            background: rgba(255, 217, 0, 0.04);
+        }
+
+        #listen-btn.playing {
+            color: var(--freq-color);
+            border-color: var(--freq-color);
+            background: rgba(255, 217, 0, 0.06);
+        }
+
+        #listen-btn .btn-dot {
+            width: 6px; height: 6px;
+            border-radius: 50%;
+            background: var(--freq-color);
+            flex-shrink: 0;
+            animation: none;
+        }
+
+        #listen-btn.playing .btn-dot {
+            animation: pulse-dot 1s ease-in-out infinite;
+        }
+
+        @keyframes pulse-dot {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50%       { opacity: 0.4; transform: scale(0.7); }
+        }
+
+        /* ── LAYOUT LETTURA ──────────────────────────────── */
+        .reader-wrap {
+            max-width: var(--reading-width);
+            margin: 0 auto;
+            padding: 6rem 2rem 5rem;
+        }
+
+        /* ── CARICAMENTO ─────────────────────────────────── */
+        #loading {
+            font-family: var(--font-mono);
+            font-size: 0.65rem;
+            letter-spacing: 0.25rem;
+            color: var(--text-muted);
+            padding: 4rem 0;
+        }
+
+        /* ── TIPOGRAFIA ARTICOLO ─────────────────────────── */
+
+        #article-content h1 {
+            font-family: var(--font-serif);
+            font-size: clamp(1.9rem, 5vw, 3rem);
+            font-weight: 700;
+            color: #fff;
+            line-height: 1.15;
+            letter-spacing: -0.02em;
+            margin-bottom: 2.5rem;
+        }
+
+        #article-content > blockquote:first-of-type {
+            border-left: none;
+            padding: 0;
+            margin: 0 0 2.5rem;
+            font-style: italic;
+            font-size: 1.1rem;
+            color: var(--freq-color);
+            opacity: 0.8;
+            line-height: 1.65;
+        }
+
+        #article-content hr {
+            border: none;
+            border-top: 1px solid var(--border);
+            margin: 3rem 0;
+        }
+
+        #article-content h2 {
+            font-family: var(--font-serif);
+            font-size: clamp(1.2rem, 2.5vw, 1.6rem);
+            font-weight: 700;
+            color: #fff;
+            margin: 4rem 0 1.25rem;
+            line-height: 1.3;
+            padding-left: 1.25rem;
+            position: relative;
+        }
+
+        #article-content h2::before {
+            content: '';
+            position: absolute;
+            left: 0; top: 0.2em;
+            width: 3px; height: 1em;
+            background: var(--freq-color);
+            opacity: 0.55;
+        }
+
+        #article-content h3 {
+            font-family: var(--font-serif);
+            font-size: 1.1rem;
+            font-weight: 700;
+            font-style: italic;
+            color: #fff;
+            margin: 2.5rem 0 0.75rem;
+        }
+
+        #article-content p {
+            font-size: clamp(0.95rem, 1.5vw, 1.05rem);
+            line-height: 1.95;
+            color: var(--text);
+            margin-bottom: 1.65rem;
+        }
+
+        #article-content strong { color: #fff; font-weight: 700; }
+        #article-content em     { font-style: italic; }
+
+        #article-content blockquote {
+            border-left: 3px solid var(--freq-color);
+            padding: 0.75rem 0 0.75rem 1.5rem;
+            margin: 2.5rem 0;
+            font-style: italic;
+            font-size: 1.05rem;
+            color: rgba(216, 216, 216, 0.65);
+            line-height: 1.7;
+        }
+
+        #article-content ul {
+            list-style: none;
+            padding: 0;
+            margin: 1.5rem 0 2rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.9rem;
+        }
+
+        #article-content ul li {
+            font-size: clamp(0.92rem, 1.4vw, 1rem);
+            line-height: 1.85;
+            color: var(--text);
+            padding-left: 1.5rem;
+            position: relative;
+        }
+
+        #article-content ul li::before {
+            content: '—';
+            position: absolute;
+            left: 0;
+            color: var(--freq-color);
+            opacity: 0.55;
+        }
+
+        #article-content ol {
+            padding-left: 1.5rem;
+            margin: 1.5rem 0 2rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        #article-content ol li {
+            font-size: clamp(0.92rem, 1.4vw, 1rem);
+            line-height: 1.85;
+            color: var(--text);
+        }
+
+        #article-content ol li::marker {
+            color: var(--freq-color);
+            opacity: 0.55;
+        }
+
+        #article-content a {
+            color: var(--freq-color);
+            border-bottom: 1px solid rgba(255, 217, 0, 0.22);
+            transition: border-color 0.2s;
+        }
+
+        #article-content a:hover { border-color: var(--freq-color); }
+
+        #article-content code {
+            font-family: var(--font-mono);
+            font-size: 0.85em;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 0.15em 0.4em;
+        }
+
+        /* Tag frequenza fine articolo */
+        #article-content p:last-child {
+            font-family: var(--font-mono);
+            font-size: 0.58rem;
+            letter-spacing: 0.2rem;
+            color: var(--freq-color);
+            opacity: 0.45;
+            margin-top: 3rem;
+        }
+
+        /* ── FOOTER ──────────────────────────────────────── */
+        .reader-footer {
+            border-top: 1px solid var(--border);
+            padding: 2.5rem 2rem;
+            max-width: var(--reading-width);
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1.25rem;
+        }
+
+        .back-full {
+            font-family: var(--font-mono);
+            font-size: 0.58rem;
+            letter-spacing: 0.2rem;
+            color: var(--text-muted);
+            transition: color 0.2s;
+        }
+
+        .back-full:hover { color: var(--gold); }
+
+        /* ── AUDIO BAR ───────────────────────────────────── */
+        #audio-bar {
+            position: fixed;
+            bottom: 0; left: 0; right: 0;
+            z-index: 250;
+            background: rgba(5, 5, 5, 0.97);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-top: 1px solid var(--border);
+            padding: 0.85rem 2rem;
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            flex-wrap: wrap;
+            transform: translateY(100%);
+            transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        #audio-bar.visible {
+            transform: translateY(0);
+        }
+
+        /* Accent line in cima alla bar, colorato per frequenza */
+        #audio-bar::before {
+            content: '';
+            position: absolute;
+            top: -1px; left: 0; right: 0;
+            height: 1px;
+            background: var(--freq-color);
+            opacity: 0.5;
+        }
+
+        .audio-play-btn {
+            display: flex;
+            align-items: center;
+            gap: 0.45rem;
+            font-family: var(--font-mono);
+            font-size: 0.58rem;
+            letter-spacing: 0.18rem;
+            color: var(--freq-color);
+            background: none;
+            border: 1px solid rgba(255, 217, 0, 0.3);
+            padding: 0.45rem 1rem;
+            cursor: pointer;
+            transition: border-color 0.2s, background 0.2s;
+            flex-shrink: 0;
+        }
+
+        .audio-play-btn:hover {
+            border-color: var(--freq-color);
+            background: rgba(255, 217, 0, 0.04);
+        }
+
+        .audio-title {
+            font-family: var(--font-mono);
+            font-size: 0.52rem;
+            letter-spacing: 0.1rem;
+            color: var(--text-muted);
+            flex: 1;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            min-width: 0;
+        }
+
+        .audio-speed-group {
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+            flex-shrink: 0;
+        }
+
+        .audio-speed-label {
+            font-family: var(--font-mono);
+            font-size: 0.5rem;
+            letter-spacing: 0.15rem;
+            color: var(--text-muted);
+            margin-right: 0.25rem;
+        }
+
+        .speed-btn {
+            font-family: var(--font-mono);
+            font-size: 0.52rem;
+            letter-spacing: 0.05rem;
+            color: var(--text-muted);
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 0.3rem 0.5rem;
+            transition: color 0.15s;
+            border-radius: 2px;
+        }
+
+        .speed-btn:hover { color: var(--text); }
+
+        .speed-btn.active {
+            color: var(--freq-color);
+            background: rgba(255, 217, 0, 0.07);
+        }
+
+        .audio-close-btn {
+            font-family: var(--font-mono);
+            font-size: 0.65rem;
+            color: var(--text-muted);
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 0.2rem;
+            transition: color 0.2s;
+            flex-shrink: 0;
+            line-height: 1;
+        }
+
+        .audio-close-btn:hover { color: var(--text); }
+
+        /* Indicatore waveform animato durante riproduzione */
+        .waveform {
+            display: flex;
+            align-items: center;
+            gap: 2px;
+            height: 14px;
+            flex-shrink: 0;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .waveform.active { opacity: 1; }
+
+        .waveform-bar {
+            width: 2px;
+            background: var(--freq-color);
+            border-radius: 1px;
+            animation: wave 1.2s ease-in-out infinite;
+        }
+
+        .waveform-bar:nth-child(1) { height: 4px;  animation-delay: 0s; }
+        .waveform-bar:nth-child(2) { height: 10px; animation-delay: 0.15s; }
+        .waveform-bar:nth-child(3) { height: 14px; animation-delay: 0.05s; }
+        .waveform-bar:nth-child(4) { height: 8px;  animation-delay: 0.25s; }
+        .waveform-bar:nth-child(5) { height: 5px;  animation-delay: 0.1s; }
+
+        @keyframes wave {
+            0%, 100% { transform: scaleY(0.4); opacity: 0.5; }
+            50%       { transform: scaleY(1);   opacity: 1; }
+        }
+
+        /* ── RESPONSIVE ──────────────────────────────────── */
+        @media (max-width: 640px) {
+            .reader-wrap     { padding-top: 5rem; }
+            .header-center   { display: none; }
+            #reading-time    { display: none; }
+            #audio-bar       { gap: 1rem; padding: 0.75rem 1rem; }
+            .audio-title     { display: none; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- PROGRESSO -->
+    <div id="reading-progress"></div>
+
+    <!-- HEADER -->
+    <header class="reader-header">
+        <a href="../index.html" class="back-link">← NEXUS</a>
+
+        <div class="header-center">
+            <div class="logo-mark">
+                <a href="../index.html">
+                    <span class="logo-black">BLACK</span><span class="logo-mono">MONO</span>
+                </a>
+            </div>
+        </div>
+
+        <div class="header-right">
+            <span id="reading-time"></span>
+            <button id="listen-btn" title="Ascolta l'articolo">
+                <span class="btn-dot"></span>
+                ASCOLTA
+            </button>
+            <span class="freq-badge" id="freq-badge">ARCHIVIO</span>
+        </div>
+    </header>
+
+    <!-- ARTICOLO -->
+    <main class="reader-wrap">
+        <article id="article-content">
+            <div id="loading">// CARICAMENTO SEGNALE...</div>
+        </article>
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="reader-footer">
+        <div class="logo-mark">
+            <span class="logo-black">BLACK</span><span class="logo-mono">MONO</span>
+        </div>
+        <a href="../index.html" class="back-full">TORNA ALL'ARCHIVIO →</a>
+    </footer>
+
+    <!-- AUDIO BAR -->
+    <div id="audio-bar">
+        <button class="audio-play-btn" id="audio-play-btn">▶ PLAY</button>
+
+        <div class="waveform" id="waveform">
+            <div class="waveform-bar"></div>
+            <div class="waveform-bar"></div>
+            <div class="waveform-bar"></div>
+            <div class="waveform-bar"></div>
+            <div class="waveform-bar"></div>
+        </div>
+
+        <span class="audio-title" id="audio-title">// IN RIPRODUZIONE</span>
+
+        <div class="audio-speed-group">
+            <span class="audio-speed-label">VEL.</span>
+            <button class="speed-btn" data-speed="0.85">0.85×</button>
+            <button class="speed-btn active" data-speed="1">1×</button>
+            <button class="speed-btn" data-speed="1.25">1.25×</button>
+            <button class="speed-btn" data-speed="1.5">1.5×</button>
+        </div>
+
+        <button class="audio-close-btn" id="audio-close-btn" title="Chiudi">✕</button>
+    </div>
+
+    <!-- Parser markdown -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/9.1.6/marked.min.js"></script>
+
+    <script>
+        /* ── COSTANTI DOM ─────────────────────────────── */
+        const params      = new URLSearchParams(window.location.search);
+        const articleFile = params.get('a');
+        const autoPlay    = params.get('play') === '1';
+
+        const loadingEl   = document.getElementById('loading');
+        const contentEl   = document.getElementById('article-content');
+        const freqBadge   = document.getElementById('freq-badge');
+        const readingTimeEl = document.getElementById('reading-time');
+        const progressBar = document.getElementById('reading-progress');
+
+        const listenBtn   = document.getElementById('listen-btn');
+        const audioBar    = document.getElementById('audio-bar');
+        const playBtn     = document.getElementById('audio-play-btn');
+        const waveform    = document.getElementById('waveform');
+        const audioTitle  = document.getElementById('audio-title');
+        const closeBtn    = document.getElementById('audio-close-btn');
+
+        /* ── MAPPA FREQUENZE ──────────────────────────── */
+        const freqColors = {
+            PICARESCA: '#c9a96e',
+            CORALE:    '#4fa8d5',
+            LOGOS:     '#5fd4b3',
+            ETEREA:    '#b794f4',
+            ENTROPIA:  '#f87171',
+        };
+
+        function applyFreqColor(color) {
+            document.documentElement.style.setProperty('--freq-color', color);
+        }
+
+        function detectFreq(text) {
+            const upper = text.toUpperCase();
+            for (const freq of Object.keys(freqColors)) {
+                if (upper.includes(freq)) return freq;
+            }
+            return null;
+        }
+
+        function estimateReadingTime(text) {
+            const words = text.trim().split(/\s+/).length;
+            const min   = Math.ceil(words / 220);
+            return min <= 1 ? '1 MIN' : `${min} MIN`;
+        }
+
+        /* ── CARICAMENTO ARTICOLO ─────────────────────── */
+        if (!articleFile) {
+            loadingEl.textContent = '// ERRORE: nessun articolo specificato.';
+        } else {
+            fetch(articleFile)
+                .then((r) => {
+                    if (!r.ok) throw new Error(`Segnale non trovato (${r.status})`);
+                    return r.text();
+                })
+                .then((md) => {
+                    loadingEl.remove();
+                    contentEl.innerHTML = marked.parse(md);
+
+                    // Titolo pagina
+                    const h1 = contentEl.querySelector('h1');
+                    if (h1) {
+                        document.title = `${h1.textContent} | BLACKMONO`;
+                        audioTitle.textContent = h1.textContent;
+                    }
+
+                    // Tempo di lettura
+                    const rt = estimateReadingTime(md);
+                    readingTimeEl.textContent = `// ${rt} DI LETTURA`;
+
+                    // Frequenza e colore
+                    const freq = detectFreq(md);
+                    if (freq) {
+                        freqBadge.textContent = `FREQ: ${freq}`;
+                        applyFreqColor(freqColors[freq]);
+                    }
+
+                    // Autoplay se richiesto
+                    if (autoPlay) setTimeout(() => openAudioBar(), 800);
+                })
+                .catch((err) => {
+                    loadingEl.textContent = `// ERRORE: ${err.message}`;
+                });
+        }
+
+        /* ── PROGRESSO SCROLL ─────────────────────────── */
+        window.addEventListener('scroll', () => {
+            const s   = window.pageYOffset;
+            const max = document.documentElement.scrollHeight - window.innerHeight;
+            progressBar.style.width = max > 0 ? `${(s / max) * 100}%` : '0%';
+        }, { passive: true });
+
+        /* ── AUDIO PLAYER (Web Speech API) ───────────────
+         *
+         *  Stati: idle → playing → paused → idle
+         *  La barra si apre/chiude indipendentemente dalla riproduzione.
+         *
+         *  Compatibilità: tutti i browser moderni supportano
+         *  speechSynthesis. Su mobile potrebbe essere limitato.
+         * ─────────────────────────────────────────────── */
+
+        const synth = window.speechSynthesis;
+        let utterance  = null;
+        let audioState = 'idle'; // 'idle' | 'playing' | 'paused'
+        let currentSpeed = 1;
+
+        /* Apre la barra senza avviare la riproduzione */
+        function openAudioBar() {
+            audioBar.classList.add('visible');
+            document.body.style.paddingBottom = '5rem';
+        }
+
+        function closeAudioBar() {
+            stopAudio();
+            audioBar.classList.remove('visible');
+            document.body.style.paddingBottom = '4rem';
+        }
+
+        /* Ottieni il testo pulito dell'articolo (senza tag HTML) */
+        function getArticleText() {
+            return contentEl.innerText || contentEl.textContent || '';
+        }
+
+        /* Attendi che le voci siano disponibili (API asincrona) */
+        function getItalianVoice() {
+            return new Promise((resolve) => {
+                const tryGet = () => {
+                    const voices = synth.getVoices();
+                    const italian = voices.find((v) => v.lang.startsWith('it'));
+                    resolve(italian || null);
+                };
+                if (synth.getVoices().length > 0) {
+                    tryGet();
+                } else {
+                    synth.addEventListener('voiceschanged', tryGet, { once: true });
+                }
+            });
+        }
+
+        async function startAudio() {
+            const text  = getArticleText();
+            const voice = await getItalianVoice();
+
+            utterance       = new SpeechSynthesisUtterance(text);
+            utterance.lang  = 'it-IT';
+            utterance.rate  = currentSpeed;
+            utterance.pitch = 1;
+            if (voice) utterance.voice = voice;
+
+            utterance.onstart = () => {
+                audioState = 'playing';
+                updateAudioUI();
+            };
+
+            utterance.onend = () => {
+                audioState = 'idle';
+                updateAudioUI();
+            };
+
+            utterance.onerror = (e) => {
+                if (e.error !== 'interrupted') {
+                    console.warn('SpeechSynthesis error:', e.error);
+                    audioState = 'idle';
+                    updateAudioUI();
+                }
+            };
+
+            synth.speak(utterance);
+        }
+
+        function pauseAudio() {
+            synth.pause();
+            audioState = 'paused';
+            updateAudioUI();
+        }
+
+        function resumeAudio() {
+            synth.resume();
+            audioState = 'playing';
+            updateAudioUI();
+        }
+
+        function stopAudio() {
+            synth.cancel();
+            utterance  = null;
+            audioState = 'idle';
+            updateAudioUI();
+        }
+
+        function togglePlayPause() {
+            if (audioState === 'idle')    { startAudio();  return; }
+            if (audioState === 'playing') { pauseAudio();  return; }
+            if (audioState === 'paused')  { resumeAudio(); return; }
+        }
+
+        function updateAudioUI() {
+            const playing = audioState === 'playing';
+            const paused  = audioState === 'paused';
+
+            // Bottone nella barra
+            if (audioState === 'idle')    playBtn.textContent = '▶ PLAY';
+            if (audioState === 'playing') playBtn.textContent = '⏸ PAUSA';
+            if (audioState === 'paused')  playBtn.textContent = '▶ RIPRENDI';
+
+            // Waveform
+            waveform.classList.toggle('active', playing);
+
+            // Bottone ASCOLTA nell'header
+            listenBtn.classList.toggle('playing', playing || paused);
+        }
+
+        /* Cambio velocità — se in riproduzione, riavvia con nuova velocità */
+        function setSpeed(speed) {
+            currentSpeed = speed;
+
+            document.querySelectorAll('.speed-btn').forEach((btn) => {
+                btn.classList.toggle('active', parseFloat(btn.dataset.speed) === speed);
+            });
+
+            if (audioState === 'playing') {
+                stopAudio();
+                startAudio();
+            } else if (utterance) {
+                utterance.rate = speed;
+            }
+        }
+
+        /* ── EVENT LISTENER ───────────────────────────── */
+
+        // Bottone ASCOLTA in header → apre barra e avvia
+        listenBtn.addEventListener('click', () => {
+            if (!audioBar.classList.contains('visible')) {
+                openAudioBar();
+                setTimeout(() => startAudio(), 100);
+            } else {
+                togglePlayPause();
+            }
+        });
+
+        // Play/Pausa nella barra
+        playBtn.addEventListener('click', togglePlayPause);
+
+        // Chiudi barra
+        closeBtn.addEventListener('click', closeAudioBar);
+
+        // Velocità
+        document.querySelectorAll('.speed-btn').forEach((btn) => {
+            btn.addEventListener('click', () => setSpeed(parseFloat(btn.dataset.speed)));
+        });
+
+        // Stop automatico se si lascia la pagina
+        window.addEventListener('beforeunload', () => synth.cancel());
+        document.addEventListener('visibilitychange', () => {
+            if (document.hidden && audioState === 'playing') pauseAudio();
+        });
+    </script>
+</body>
+</html>
